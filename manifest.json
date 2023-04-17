@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "JW.org Scripture Copier",
+  "version": "1.0",
+  "description": "A Chrome extension to copy scriptures from JW.org search results.",
+  "permissions": ["clipboardWrite"],
+  "content_scripts": [
+    {
+      "matches": ["https://wol.jw.org/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
