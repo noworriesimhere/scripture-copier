@@ -15,8 +15,14 @@ if (window.location.hostname === "wol.jw.org") {
 
     // Extract the book, chapter, and verse information from each search result element
     const bookChapterVerse = result.querySelector(".cardTitleBlock .cardLine1").textContent.trim();
-    const [bookChapter, ...verses] = bookChapterVerse.split(/\s+/);
-    const [book, chapter] = bookChapter.split(/\s+/);
+    const [bookChapter, ...verses] = bookChapterVerse.split(':');
+    const lastSpaceIndex = bookChapter.lastIndexOf(' ');
+    const book = bookChapter.substring(0, lastSpaceIndex);
+    const chapter = bookChapter.substring(lastSpaceIndex + 1);
+
+    if (verses[0] === "1" || verses[0].startsWith("1-")) {
+      scriptureTexts[0] = scriptureTexts[0].replace(chapter, "1");
+    }    
 
     // Merge multiple search result elements from the same chapter into one excerpt
     const lastExcerpt = scriptureExcerpts[scriptureExcerpts.length - 1];
@@ -35,23 +41,22 @@ if (window.location.hostname === "wol.jw.org") {
 
   // Create a formatted message with all of the extracted scripture excerpts
   const copiedMessage = scriptureExcerpts
-    .map(excerpt => `${excerpt.book} ${excerpt.chapter}:${excerpt.verses.join(',')} —— ${excerpt.scriptureText}`)
+    .map(excerpt => `${excerpt.book} ${excerpt.chapter}:${excerpt.verses.join(',')} — ${excerpt.scriptureText}`)
     .join('\n\n')
-    .replace(/undefined:/g, '')
-    .replace(",", " ")
     .replaceAll("*", "");
+
+  
 
   // Copy the message to the user's clipboard and show a notification
   if (copiedMessage !== "") {
     navigator.clipboard.writeText(copiedMessage)
       .then(() => {
         // Log a message to the console indicating that the scripture was copied
-        console.log("Scripture copied!");
         console.log(copiedMessage);
 
         // Create a notification element with the copied message
         const notification = document.createElement('div');
-        notification.innerText = "Scripture copied!";
+        notification.innerText = "Scripture copied! Now buy Alan a cup of coffee :)";
         notification.style.position = 'fixed';
         notification.style.top = '60px'; // match the position of the website's top menu
         notification.style.right = '10px'; // align the notification with the right edge of the screen
@@ -64,6 +69,7 @@ if (window.location.hostname === "wol.jw.org") {
         notification.style.zIndex = '9999';
         notification.style.opacity = '0';
         notification.style.transition = 'opacity 1s';
+        notification.style.fontFamily = 'NotoSans';
 
         // Add the notification element to the page
         document.body.appendChild(notification);
